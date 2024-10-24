@@ -2,4 +2,4 @@ start:
 	node app.js
 
 docker-build:
-	docker build -t xybor/todennus-idp .
+	docker build -t todennus/idp .

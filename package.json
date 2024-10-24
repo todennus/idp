@@ -1,5 +1,5 @@
 {
-  "name": "todennus-idp",
+  "name": "idp",
   "version": "1.0.0",
   "description": "Todennus Identity Provider",
   "main": "app.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xybor/todennus-idp.git"
+    "url": "git+https://github.com/todennus/idp.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/xybor/todennus-idp/issues"
+    "url": "https://github.com/todennus/idp/issues"
   },
-  "homepage": "https://github.com/xybor/todennus-idp#readme",
+  "homepage": "https://github.com/todennus/idp#readme",
   "dependencies": {
     "@grpc/grpc-js": "^1.12.2",
     "@grpc/proto-loader": "^0.7.13",
