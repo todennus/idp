@@ -1,6 +1,6 @@
 FROM node:14-alpine
 
-WORKDIR /todennus-idp
+WORKDIR /idp
 
 COPY package*.json ./
 
