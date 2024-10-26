@@ -89,7 +89,7 @@ app.post('/login', async (req, res) => {
         const authCallbackURL = new URL(env.TODENNUS_AUTH_CALLBACK_URL)
         await axios.post(authCallbackURL.href, authCallbackBody).then(response => {
             logger.debug('auth-callback-response', { 'status': response.status, 'data': response.data })
-            res.redirect(301, env.TODENNUS_SESSION_UPDATE_URL + '?authentication_id=' + response.data.data.authentication_id)
+            res.redirect(301, env.TODENNUS_AUTH_UPDATE_URL + '?authentication_id=' + response.data.data.authentication_id)
         }).catch(error => {
             logger.warn('failed-to-auth-callback', { 'response': error });
             res.write('invalid todennus response')
