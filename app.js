@@ -11,6 +11,22 @@ require('dotenv').config();
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
+const { ClientCredentials } = require('simple-oauth2');
+
+const serviceAuth = new ClientCredentials({
+    client: {
+        id: env.SERVICE_CLIENT_ID,
+        secret: env.SERVICE_CLIENT_SECRET,
+    },
+    auth: {
+        tokenHost: env.SERVICE_TOKEN_HOST,
+        tokenPath: env.SERVICE_TOKEN_PATH,
+    },
+    options: {
+        authorizationMethod: 'body',
+    }
+});
+
 // Load the proto file
 const PROTO_PATH = path.join(__dirname, 'proto');
 const userPackageDefinition = protoLoader.loadSync(path.join(PROTO_PATH, 'user.proto'), {
@@ -61,13 +77,18 @@ app.post('/login', async (req, res) => {
     const { authorization_id } = req.query;
     logger.debug('login-request', { 'authorization_id': authorization_id, 'username': username });
 
+    const metadata = new grpc.Metadata();
+    const accessToken = await getAccessToken();
+    console.log("ACCESS TOKEN: ", accessToken);
+    metadata.add('authorization', 'Bearer ' + accessToken);
+
     const userValidateRequest = {
         'username': username,
         'password': password
     };
 
     const authCallbackBody = {};
-    userRPCClient.Validate(userValidateRequest, async (error, response) => {
+    userRPCClient.Validate(userValidateRequest, metadata, async (error, response) => {
         if (error) {
             logGrpcError(error);
             const error_details = error.details.split(":")
@@ -124,13 +145,26 @@ function logGrpcError(error) {
             case grpc.status.PERMISSION_DENIED:
                 key = 'permission-denined';
                 break;
+            case grpc.status.UNAUTHENTICATED:
+                key = 'unauthenticated';
+                break
             default:
-                key = 'unknown-code:', error.code;
+                key = 'unknown-code:' + error.code;
                 break;
         }
 
         // Get the error code and message from the error object
         logger.warn(key, { 'detail': error.details });
 
+    }
+}
+
+async function getAccessToken() {
+    try {
+        const token = await serviceAuth.getToken({ scope: "todennus/admin:validate:user" });
+        return token.token.access_token;
+    } catch (error) {
+        console.error('Error obtaining access token:', error);
+        return '';
     }
 }
